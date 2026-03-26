@@ -119,17 +119,73 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
     convertProxy(proxy) {
         switch (proxy.type) {
             case 'shadowsocks':
-                return {
+                const ssConfig = {
                     name: proxy.tag,
                     type: 'ss',
                     server: proxy.server,
                     port: proxy.server_port,
                     cipher: proxy.method,
-                    password: proxy.password,
-                    ...(typeof proxy.udp !== 'undefined' ? { udp: proxy.udp } : {}),
-                    ...(proxy.plugin ? { plugin: proxy.plugin } : {}),
-                    ...(proxy.plugin_opts ? { 'plugin-opts': proxy.plugin_opts } : {})
+                    password: proxy.password
                 };
+
+                // 处理插件配置
+                if (proxy.plugin) {
+                    ssConfig.plugin = proxy.plugin;
+                    ssConfig['plugin-opts'] = {};
+
+                    // 处理插件选项
+                    if (proxy.plugin_opts) {
+                        const opts = proxy.plugin_opts;
+                        
+                        // 确保处理所有可能的参数
+                        if (opts.mode !== undefined) {
+                            ssConfig['plugin-opts'].mode = opts.mode;
+                        }
+                        
+                        if (opts.host !== undefined) {
+                            ssConfig['plugin-opts'].host = opts.host;
+                        }
+                        
+                        if (opts.path !== undefined) {
+                            ssConfig['plugin-opts'].path = opts.path;
+                        }
+                        
+                        if (opts.tls !== undefined) {
+                            ssConfig['plugin-opts'].tls = opts.tls;
+                        }
+                        
+                        if (opts.peer !== undefined) {
+                            ssConfig['plugin-opts'].peer = opts.peer;
+                        }
+                        
+                        if (opts.mux !== undefined) {
+                            ssConfig['plugin-opts'].mux = opts.mux;
+                        }
+                        
+                        if (opts.skip_cert_verify !== undefined) {
+                            ssConfig['plugin-opts'].allowInsecure = opts.skip_cert_verify;
+                        }
+                    }
+                }
+
+                // 添加客户端指纹
+                if (proxy.tls?.utls?.fingerprint) {
+                    ssConfig['client-fingerprint'] = proxy.tls.utls.fingerprint;
+                } else if (proxy.transport?.type === 'ws' || proxy.plugin) {
+                    // 对于WebSocket或插件配置，添加默认的chrome指纹
+                    ssConfig['client-fingerprint'] = 'chrome';
+                }
+
+                // 为plugin-opts添加特殊标记，以便在YAML转储时以内联方式显示
+                if (ssConfig['plugin-opts']) {
+                    Object.defineProperty(ssConfig['plugin-opts'], '__inline', {
+                        value: true,
+                        enumerable: false,
+                        writable: false
+                    });
+                }
+
+                return ssConfig;
             case 'vmess':
                 return {
                     name: proxy.tag,
