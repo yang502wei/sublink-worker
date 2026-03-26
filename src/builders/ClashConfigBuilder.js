@@ -159,7 +159,7 @@ export class ClashConfigBuilder extends BaseConfigBuilder {
                         }
                         
                         if (opts.mux !== undefined) {
-                            ssConfig['plugin-opts'].mux = opts.mux;
+                            ssConfig['plugin-opts'].mux = false;
                         }
                         
                         if (opts.skip_cert_verify !== undefined) {
