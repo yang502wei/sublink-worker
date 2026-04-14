@@ -25,7 +25,7 @@
   <p>
     <a href="https://app.sublink.works"><b>⚡ Live Demo</b></a> ·
     <a href="https://sublink.works/en/"><b>Documentation</b></a> 
-    <a href="https://sublink.works"><b>中文文档</b></a>·
+    <a href="https://sublink.works"><b>中文档</b></a>·
   </p>
   <p>
     <a href="https://sublink.works/guide/quick-start/">Quick Start</a> ·
